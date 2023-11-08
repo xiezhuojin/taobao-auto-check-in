@@ -33,7 +33,7 @@ def start_taobao():
     
 def enter_check_in_page():
     poco(name="签到").click()
-    sleep(3)
+    sleep(10)
     while poco(text="关闭").exists():
         poco(text="关闭").click()
         
@@ -43,7 +43,7 @@ def check_in():
         
 def do_tasks():
     poco(text="赚元宝").click()
-    sleep(3)
+    sleep(5)
     
     # 逛精选好货赚元宝
     browse_carefully_selected_good_pattern = r"逛精选好货赚元宝\((\d+)/(\d+)\)"
@@ -56,11 +56,16 @@ def do_tasks():
         poco(text='去逛逛')[0].click()
         total_time = 30
         max_sleep_time = 5
-        while total_time:
+        while True:
             poco(text="红包签到浏览下单页").swipe("up")
             sleep_time = random.random() * max_sleep_time
-            sleep(sleep_time)
             total_time -= sleep_time
+            if total_time >= 0:
+                sleep(sleep_time)
+            else:
+                break
+        while poco(text="关闭").exists():
+            poco(text="关闭").click()
         keyevent("KEYCODE_BACK")
         poco(text="赚元宝").click()
         
@@ -75,12 +80,16 @@ def do_tasks():
         poco(text='去逛逛')[0].click()
         total_time = 10
         max_sleep_time = 5
-        accumulated_sleep_time = 0
-        while accumulated_sleep_time <= total_time:
+        while True:
             poco(text="淘工厂特卖店").swipe("up")
             sleep_time = random.random() * max_sleep_time
-            sleep(sleep_time)
-            accumulated_sleep_time += sleep_time
+            total_time -= sleep_time
+            if total_time >= 0:
+                sleep(sleep_time)
+            else:
+                break
+        while poco(text="关闭").exists():
+            poco(text="关闭").click()
         keyevent("KEYCODE_BACK")
         poco(text="赚元宝").click()
     
@@ -89,10 +98,13 @@ def do_tasks():
 def check_in():
     if poco(text="立即签到").exists():
         poco(text="立即签到").click()
+    sleep(5)
+    while poco(text="关闭").exists():
+        poco(text="关闭").click()
         
 def click_to_reap():
-    sleep_time = [0, 10, 30, 60, 300, 600]
-    n_click = 4
+    sleep_time = [10, 30, 60, 150, 300, 600]
+    n_click = 5
     for i in range(n_click):
         if poco(text="点击领取").exists():
             poco(text="点击领取").click()
@@ -100,9 +112,8 @@ def click_to_reap():
             sleep(sleep_time[i])
             
 def verify():
+    assert_equal(poco(text="立即签到").exists(), False, "签到检查")
     poco(text="赚元宝").click()
-    assert not poco(text='去逛逛').exists()
-    keyevent("KEYCODE_BACK")
-    assert not poco(text="立即签到").exists()
+    assert_equal(poco(text='去逛逛').exists(), False, "逛精选好物赚元宝、逛0.99元赚元宝检查")
     
 main()
